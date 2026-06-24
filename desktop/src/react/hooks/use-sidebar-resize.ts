@@ -252,6 +252,53 @@ export function useSidebarResize(): void {
       PREVIEW_MIN, getPreviewMaxWidth, 'hana-preview-width', true,
     );
 
+    // ── IDE 模式：chat ↔ editor 分隔条（仅 currentTab === 'ide' 时激活） ──
+    const CHAT_PANE_MIN = 360;
+    const chatEditorHandle = document.getElementById('chatEditorResizeHandle');
+    const chatEditorPane = document.querySelector('.ide-chat-pane') as HTMLElement | null;
+    const isIdeMode = useStore.getState().currentTab === 'ide';
+
+    function applyChatPaneWidth(w: number): void {
+      const px = w + 'px';
+      root.style.setProperty('--chat-pane-width', px);
+      if (chatEditorPane) {
+        chatEditorPane.style.width = px;
+        chatEditorPane.style.minWidth = px;
+      }
+    }
+
+    function getChatEditorMaxWidth(): number {
+      const state = useStore.getState();
+      const sidebarW = state.sidebarOpen
+        ? (parseInt(getComputedStyle(root).getPropertyValue('--sidebar-width'), 10) || 240)
+        : 0;
+      const editorMinW = 360;
+      return Math.max(CHAT_PANE_MIN, window.innerWidth - sidebarW - editorMinW);
+    }
+
+    if (chatEditorPane) {
+      // 恢复保存的宽度
+      const savedChatPaneWidth = localStorage.getItem('hana-chat-pane-width');
+      if (savedChatPaneWidth) {
+        const n = Number(savedChatPaneWidth);
+        if (Number.isFinite(n)) applyChatPaneWidth(Math.max(CHAT_PANE_MIN, Math.min(getChatEditorMaxWidth(), n)));
+      } else {
+        // 默认 520px
+        applyChatPaneWidth(520);
+      }
+    }
+
+    // 仅在 IDE 模式时绑定 chatEditorResizeHandle（其他 Tab 不响应拖动）
+    if (isIdeMode) {
+      setupHandle(
+        chatEditorHandle,
+        () => chatEditorPane,
+        () => chatEditorPane?.offsetWidth || 520,
+        (w) => applyChatPaneWidth(w),
+        CHAT_PANE_MIN, getChatEditorMaxWidth, 'hana-chat-pane-width', false,
+      );
+    }
+
     return () => {
       for (const cleanup of cleanupFns) cleanup();
     };

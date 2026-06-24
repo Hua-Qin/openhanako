@@ -19,6 +19,7 @@
 
     /* 对话列宽 */
     --chat-column-width: 720px;
+    --chat-pane-width: 520px;  /* IDE 模式聊天栏宽度 */
     --chat-input-column-extra: 1.25rem;
     --chat-input-column-width: calc(var(--chat-column-width) + var(--chat-input-column-extra));
     --welcome-chat-input-column-width: 40rem;
@@ -4113,6 +4114,154 @@ html[data-platform="linux"] .onboarding {
     }
     .programming-empty-card {
         padding: var(--space-md) var(--space-sm);
+    }
+}
+
+/* =========================================
+   IDE 模式（三栏布局：左 chat | 分隔条 | 右 editor）
+   - ChatSidebar（左）由 App.tsx 全局渲染；session 列表 + files 分段控件
+   - IdePage 内含 ChatPage（左 chat 栏）+ resize-handle + PreviewPanel（由 AppPages 全局渲染在 MainContent 中）
+   - 分隔条使用主题 token（不硬编码蓝色）
+   ========================================= */
+.ide-page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--bg);
+}
+
+.ide-editor-split {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+}
+
+.ide-chat-pane {
+    width: var(--chat-pane-width);
+    min-width: var(--chat-pane-width);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    transition: width var(--duration-slow) var(--ease-out);
+    overflow: hidden;
+    border-right: 1px solid var(--panel-card-border);
+}
+
+.ide-instructions {
+    flex: 0 0 auto;
+    min-height: 140px;
+    max-height: 35%;
+    border-top: 1px solid var(--panel-card-border);
+    background: var(--panel-card-bg);
+    overflow: hidden;
+}
+
+/* ── 垂直分隔条（chat ↔ editor）— 主题适配，不用纯蓝色 ── */
+.resize-handle.resize-handle-vertical {
+    position: relative;
+    width: 4px;
+    cursor: col-resize;
+    background: transparent;
+    transition: background var(--duration-fast) var(--ease-out);
+    flex-shrink: 0;
+    z-index: 5;
+    align-self: stretch;
+}
+.resize-handle.resize-handle-vertical::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    transform: translateX(-50%);
+    background: var(--border, rgba(0, 0, 0, 0.18));
+    transition: background var(--duration-fast) var(--ease-out);
+}
+.resize-handle.resize-handle-vertical:hover,
+.resize-handle.resize-handle-vertical.active {
+    background: var(--overlay-light, rgba(0, 0, 0, 0.06));
+}
+.resize-handle.resize-handle-vertical:hover::after,
+.resize-handle.resize-handle-vertical.active::after {
+    background: var(--text-secondary, rgba(0, 0, 0, 0.45));
+}
+
+/* 拖拽中禁用 chat 栏过渡，避免宽度变化卡顿 */
+body.resizing .ide-chat-pane {
+    transition: none !important;
+}
+
+/* ── ChatSidebar 分段控件（Chats / Files） ── */
+.sidebar-segmented {
+    display: flex;
+    gap: 2px;
+    padding: var(--space-xs) var(--space-sm);
+    border-bottom: 1px solid var(--panel-card-border);
+    background: var(--bg-secondary, rgba(0, 0, 0, 0.02));
+}
+.sidebar-segmented button {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 8px;
+    font-size: 12px;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary, #666);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out);
+}
+.sidebar-segmented button:hover:not(.active) {
+    background: var(--overlay-light, rgba(0, 0, 0, 0.04));
+    color: var(--text);
+}
+.sidebar-segmented button.active {
+    background: var(--panel-card-bg);
+    color: var(--text);
+    border-color: var(--panel-card-border);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.sidebar-files {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── 窄屏适配 ── */
+@media (max-width: 1024px) {
+    .ide-chat-pane {
+        min-width: 320px;
+    }
+}
+@media (max-width: 768px) {
+    .ide-editor-split {
+        flex-direction: column;
+    }
+    .ide-chat-pane {
+        width: 100%;
+        min-width: 0;
+        max-height: 50%;
+        border-right: none;
+        border-bottom: 1px solid var(--panel-card-border);
+    }
+    .resize-handle.resize-handle-vertical {
+        display: none;
     }
 }
 

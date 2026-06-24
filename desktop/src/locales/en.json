@@ -37,7 +37,7 @@
   "channel": {
     "tab": "Channels",
     "chatTab": "Chat",
-    "programmingTab": "Code",
+    "ideTab": "IDE",
     "moreTabs": "More tabs",
     "empty": "No channels yet ✿",
     "dmLabel": "Messages",
@@ -909,7 +909,7 @@
       "models": "Models",
       "memory": "Memory",
       "work": "Workspace",
-      "programming": "Programming",
+      "ide": "IDE",
       "skills": "Skills",
       "mcp": "Connectors",
       "bridge": "Social Platforms",

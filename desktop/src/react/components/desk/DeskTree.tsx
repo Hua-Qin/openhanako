@@ -324,6 +324,7 @@ function TreeNode({
 }) {
   const deskBasePath = useStore(st => st.deskBasePath);
   const deskWorkspaceMountId = useStore(st => st.deskWorkspaceMountId);
+  const currentTab = useStore(st => st.currentTab);
   // 工作台根的 native 路径：普通文件夹即 deskBasePath；local_fs mount 用服务端
   // 披露的 native root（#1622）。远端/虚拟 mount 为 null，相关本地能力保持隐藏。
   const nativeRootDir = useStore(deskNativeRootDir);
@@ -379,8 +380,9 @@ function TreeNode({
     const multi = event.metaKey || event.ctrlKey;
     onSelect(subdir, { multi, shift: event.shiftKey });
     if (file.isDir && !multi && !event.shiftKey) toggleFolder();
-    if (!file.isDir && (isWebRuntime() || deskWorkspaceMountId) && !multi && !event.shiftKey) previewFile();
-  }, [deskWorkspaceMountId, file.isDir, onSelect, previewFile, subdir, toggleFolder]);
+    // IDE 模式 / web 运行时 / mount 工作台 → 单击文件直接打开编辑器（与 VSCode/Trae 一致）
+    if (!file.isDir && (isWebRuntime() || deskWorkspaceMountId || currentTab === 'ide') && !multi && !event.shiftKey) previewFile();
+  }, [currentTab, deskWorkspaceMountId, file.isDir, onSelect, previewFile, subdir, toggleFolder]);
 
   const openFile = useCallback(() => {
     onSelect(subdir, { multi: false, shift: false });

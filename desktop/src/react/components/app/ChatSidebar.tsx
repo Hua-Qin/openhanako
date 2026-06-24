@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import type { ActivePanel } from '../../types';
 import { useStore } from '../../stores';
 import { useAnyBrowserRunning } from '../../stores/browser-slice';
@@ -5,6 +6,7 @@ import { ChannelListSidebar } from '../channels/ChannelList';
 import { RegionalErrorBoundary } from '../RegionalErrorBoundary';
 import { SessionList } from '../SessionList';
 import { SidebarNoticeSlot } from '../notices/SidebarNoticeSlot';
+import { DeskSection } from '../DeskSection';
 
 interface ChatSidebarContentProps {
   showSettingsButton?: boolean;
@@ -122,18 +124,115 @@ export function ChatSidebarContent({
   );
 }
 
+// ── IDE 模式：Chats / Files 分段控件（仅在 currentTab === 'ide' 时启用） ──
+
+type SidebarMode = 'chats' | 'files';
+
+function readSidebarMode(tab: string): SidebarMode {
+  try {
+    const v = localStorage.getItem(`hana-sidebar-mode-${tab}`);
+    return v === 'files' ? 'files' : 'chats';
+  } catch {
+    return 'chats';
+  }
+}
+
+function writeSidebarMode(tab: string, mode: SidebarMode): void {
+  try {
+    localStorage.setItem(`hana-sidebar-mode-${tab}`, mode);
+  } catch {
+    /* ignore */
+  }
+}
+
+function SegmentIcon({ kind }: { kind: SidebarMode }) {
+  // 极简的内联图标（不依赖外部 SVG 库）
+  if (kind === 'chats') {
+    return (
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    );
+  }
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    </svg>
+  );
+}
+
+function SidebarSegmented({
+  mode,
+  onChange,
+}: {
+  mode: SidebarMode;
+  onChange: (m: SidebarMode) => void;
+}) {
+  const t = window.t ?? ((k: string) => k);
+  return (
+    <div className="sidebar-segmented" role="tablist">
+      <button
+        type="button"
+        className={mode === 'chats' ? 'active' : ''}
+        role="tab"
+        aria-selected={mode === 'chats'}
+        onClick={() => onChange('chats')}
+      >
+        <SegmentIcon kind="chats" />
+        <span style={{ marginLeft: 4 }}>{t('sidebar.chatsTab', { defaultValue: '会话' })}</span>
+      </button>
+      <button
+        type="button"
+        className={mode === 'files' ? 'active' : ''}
+        role="tab"
+        aria-selected={mode === 'files'}
+        onClick={() => onChange('files')}
+      >
+        <SegmentIcon kind="files" />
+        <span style={{ marginLeft: 4 }}>{t('sidebar.filesTab', { defaultValue: '文件' })}</span>
+      </button>
+    </div>
+  );
+}
+
 export function ChatSidebar({
   open,
   includeChannels = true,
   ...contentProps
 }: ChatSidebarProps) {
   const currentTab = useStore(s => s.currentTab);
+  const isIdeMode = currentTab === 'ide';
+  const [ideSidebarMode, setIdeSidebarMode] = useState<SidebarMode>(() =>
+    readSidebarMode('ide')
+  );
+
+  // 当切换 Tab 时重置到该 Tab 上次保存的模式
+  useEffect(() => {
+    if (isIdeMode) setIdeSidebarMode(readSidebarMode('ide'));
+  }, [currentTab, isIdeMode]);
+
+  const handleIdeModeChange = (m: SidebarMode) => {
+    setIdeSidebarMode(m);
+    writeSidebarMode('ide', m);
+  };
 
   return (
     <aside className={`sidebar${open ? '' : ' collapsed'}`} id="sidebar">
       <div className="sidebar-inner">
-        <div className={`sidebar-chat-content${currentTab === 'chat' || currentTab === 'programming' ? '' : ' hidden'}`}>
-          <ChatSidebarContent {...contentProps} />
+        <div className={`sidebar-chat-content${currentTab === 'chat' || currentTab === 'ide' ? '' : ' hidden'}`}>
+          {isIdeMode && <SidebarSegmented mode={ideSidebarMode} onChange={handleIdeModeChange} />}
+          {isIdeMode && ideSidebarMode === 'files' ? (
+            <div className="sidebar-files">
+              <DeskSection
+                framed={false}
+                showHeader={true}
+                rightWorkspaceLayout={false}
+                fullWidthMode={false}
+              />
+            </div>
+          ) : (
+            <ChatSidebarContent {...contentProps} />
+          )}
         </div>
 
         {includeChannels && (

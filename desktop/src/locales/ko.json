@@ -31,7 +31,7 @@
   "channel": {
     "tab": "채널",
     "chatTab": "채팅",
-    "programmingTab": "프로그래밍",
+    "ideTab": "IDE",
     "moreTabs": "더 많은 탭",
     "empty": "아직 채널이 없어요 ✿",
     "dmLabel": "메시지",
@@ -852,7 +852,7 @@
       "models": "모델",
       "memory": "기억",
       "work": "워크스페이스",
-      "programming": "프로그래밍",
+      "ide": "IDE",
       "skills": "스킬",
       "mcp": "Connectors",
       "bridge": "소셜",

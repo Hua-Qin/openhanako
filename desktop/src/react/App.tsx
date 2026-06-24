@@ -69,7 +69,7 @@ function App() {
   const currentTab = useStore(s => s.currentTab);
   const isPluginTab = typeof currentTab === 'string' && currentTab.startsWith('plugin:');
   // 编程模式同样使用 ChatSidebar 作为左侧 session 列表
-  const showLeftSidebar = (currentTab === 'chat' || currentTab === 'programming') && !isPluginTab;
+  const showLeftSidebar = (currentTab === 'chat' || currentTab === 'ide') && !isPluginTab;
   const { side: floatSide, show: showFloat, scheduleHide: scheduleFloatHide, cancelHide: cancelFloatHide, hide: hideFloat } = useFloatSidebar();
 
   useEffect(() => {

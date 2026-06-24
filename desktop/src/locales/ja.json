@@ -31,7 +31,7 @@
   "channel": {
     "tab": "チャンネル",
     "chatTab": "チャット",
-    "programmingTab": "プログラミング",
+    "ideTab": "IDE",
     "moreTabs": "その他のタブ",
     "empty": "チャンネルはまだありません ✿",
     "dmLabel": "メッセージ",
@@ -852,7 +852,7 @@
       "models": "モデル",
       "memory": "記憶",
       "work": "ワークスペース",
-      "programming": "プログラミング",
+      "ide": "IDE",
       "skills": "スキル",
       "mcp": "Connectors",
       "bridge": "ソーシャル",
