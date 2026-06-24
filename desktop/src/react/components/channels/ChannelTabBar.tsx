@@ -26,7 +26,7 @@ export function switchTab(tab: TabType) {
   const s = useStore.getState();
   if (tab === s.currentTab) return;
 
-  if (tab === 'channels') {
+  if (tab === 'channels' || tab === 'programming') {
     s.setActivePanel(null);
   }
 
@@ -34,6 +34,10 @@ export function switchTab(tab: TabType) {
   if (tab === 'channels') {
     hydrateCurrentChannelIfNeeded().catch((err: unknown) =>
       console.warn('[channels] hydrate current channel failed', err));
+  }
+  // 进入编程模式时自动展开右侧 AI 副驾驶（jian sidebar）
+  if (tab === 'programming' && !s.jianOpen) {
+    s.setJianOpen(true);
   }
   localStorage.setItem('hana-tab', tab);
 
@@ -61,11 +65,13 @@ function buildTabList(pluginPages: PluginPageInfo[], tabOrder: string[]): TabTyp
     if (!ordered.includes(tab)) ordered.push(tab);
   }
 
-  return ['chat' as TabType, ...ordered];
+  // 'chat' 和 'programming' 都是固定不可拖拽的固定 Tab，且 'programming' 排在 chat 之后
+  return ['chat' as TabType, 'programming' as TabType, ...ordered];
 }
 
 function getTabLabel(tab: TabType, pluginPages: PluginPageInfo[], locale: string): string {
   if (tab === 'chat') return t('channel.chatTab');
+  if (tab === 'programming') return t('channel.programmingTab');
   if (tab === 'channels') return t('channel.tab');
   if (typeof tab === 'string' && tab.startsWith('plugin:')) {
     const pluginId = tab.slice(7);
@@ -94,11 +100,11 @@ export function ChannelTabBar() {
   const hiddenPages = pluginPages.filter(p => hiddenPluginTabs.includes(p.pluginId));
 
   const allTabs = buildTabList(visiblePages, tabOrder);
-  // chat is always first and not draggable; split into visible and overflow
-  const draggableTabs = allTabs.slice(1);
+  // 'chat' 和 'programming' 是固定不可拖拽的固定 Tab；其余（channels + plugins）可拖拽
+  const draggableTabs = allTabs.slice(2);
   const visibleDraggable = draggableTabs.slice(0, MAX_VISIBLE_DRAGGABLE);
   const overflowDraggable = draggableTabs.slice(MAX_VISIBLE_DRAGGABLE);
-  const visibleTabs: TabType[] = ['chat' as TabType, ...visibleDraggable];
+  const visibleTabs: TabType[] = ['chat' as TabType, 'programming' as TabType, ...visibleDraggable];
 
   const tabsRef = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -164,14 +170,14 @@ export function ChannelTabBar() {
   // ── Drag handlers ──
 
   const onDragStart = useCallback((e: React.DragEvent, tab: TabType) => {
-    if (tab === 'chat') { e.preventDefault(); return; }
+    if (tab === 'chat' || tab === 'programming') { e.preventDefault(); return; }
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', tab);
     setDragTab(tab);
   }, []);
 
   const onDragOver = useCallback((e: React.DragEvent, tab: TabType) => {
-    if (tab === 'chat') return;
+    if (tab === 'chat' || tab === 'programming') return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     setDragOverTab(tab);
@@ -241,7 +247,7 @@ export function ChannelTabBar() {
             ref={(el) => setBtnRef(tab, el)}
             className={cls}
             data-tab={tab}
-            draggable={tab !== 'chat'}
+            draggable={tab !== 'chat' && tab !== 'programming'}
             onClick={() => handleTabClick(tab)}
             onContextMenu={(e) => handleTabContextMenu(e, tab)}
             onDragStart={(e) => onDragStart(e, tab)}

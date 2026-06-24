@@ -26,12 +26,14 @@ export function DeskDropZone({
   onStartCreate,
   framed = true,
   rightWorkspaceLayout = false,
+  fullWidthMode = false,
 }: {
   children: React.ReactNode;
   onShowMenu: (state: CtxMenuState) => void;
   onStartCreate: (parentSubdir: string, kind: InlineCreateKind) => Promise<void>;
   framed?: boolean;
   rightWorkspaceLayout?: boolean;
+  fullWidthMode?: boolean;
 }) {
   const [dragging, setDragging] = useState(false);
 
@@ -143,6 +145,7 @@ export function DeskDropZone({
     framed ? 'universal-card' : '',
     s.section,
     rightWorkspaceLayout ? s.rightWorkspaceSection : '',
+    fullWidthMode ? s.fullWidthSection : '',
     dragging ? s.dragOver : '',
   ].filter(Boolean).join(' ');
 

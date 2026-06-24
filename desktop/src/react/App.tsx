@@ -68,6 +68,8 @@ function App() {
   const jianOpen = useStore(s => s.jianOpen);
   const currentTab = useStore(s => s.currentTab);
   const isPluginTab = typeof currentTab === 'string' && currentTab.startsWith('plugin:');
+  // 编程模式同样使用 ChatSidebar 作为左侧 session 列表
+  const showLeftSidebar = (currentTab === 'chat' || currentTab === 'programming') && !isPluginTab;
   const { side: floatSide, show: showFloat, scheduleHide: scheduleFloatHide, cancelHide: cancelFloatHide, hide: hideFloat } = useFloatSidebar();
 
   useEffect(() => {
@@ -107,7 +109,7 @@ function App() {
         {/* ── App body ── */}
         <div className="app">
           <ChatSidebar
-            open={sidebarOpen && !isPluginTab}
+            open={sidebarOpen && showLeftSidebar}
             onNewSession={createNewSession}
             onCollapse={() => toggleSidebar()}
             onOpenSettings={() => openSettingsModal()}

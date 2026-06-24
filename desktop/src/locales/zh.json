@@ -37,6 +37,7 @@
   "channel": {
     "tab": "频道",
     "chatTab": "聊天",
+    "programmingTab": "编程",
     "moreTabs": "更多标签",
     "empty": "还没有频道 ✿",
     "dmLabel": "私聊",
@@ -908,6 +909,7 @@
       "models": "模型",
       "memory": "记忆",
       "work": "工作台",
+      "programming": "编程",
       "skills": "技能",
       "mcp": "连接器",
       "bridge": "社交平台",

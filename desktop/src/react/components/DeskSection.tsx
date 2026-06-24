@@ -84,10 +84,12 @@ export function DeskSection({
   framed = true,
   showHeader = true,
   rightWorkspaceLayout = false,
+  fullWidthMode = false,
 }: {
   framed?: boolean;
   showHeader?: boolean;
   rightWorkspaceLayout?: boolean;
+  fullWidthMode?: boolean;
 }) {
   const deskBasePath = useStore(st => st.deskBasePath);
   const deskExpandedPaths = useStore(st => st.deskExpandedPaths);
@@ -172,6 +174,7 @@ export function DeskSection({
         onStartCreate={handleStartCreate}
         framed={framed}
         rightWorkspaceLayout={rightWorkspaceLayout}
+        fullWidthMode={fullWidthMode}
       >
         {showHeader && (
           <div className={s.header}>

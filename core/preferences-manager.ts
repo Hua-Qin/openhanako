@@ -38,6 +38,10 @@ import {
   normalizeNotificationPreferences,
 } from "../shared/notification-preferences.ts";
 import {
+  mergeProgrammingPreferences,
+  normalizeProgrammingPreferences,
+} from "../shared/programming-preferences.ts";
+import {
   mergeQuickChatPreferences,
   normalizeQuickChatPreferences,
 } from "../shared/quick-chat-preferences.ts";
@@ -463,6 +467,19 @@ export class PreferencesManager {
     prefs.notifications = mergeNotificationPreferences(prefs.notifications || {}, partial || {});
     this.savePreferences(prefs);
     return prefs.notifications;
+  }
+
+  /** 读取编程模式偏好（AI 辅助开关、模型偏好、终端自动确认）。 */
+  getProgrammingPreferences() {
+    return normalizeProgrammingPreferences(this._cache.programming || {});
+  }
+
+  /** 合并写入编程模式偏好。 */
+  setProgrammingPreferences(partial) {
+    const prefs = this._mutableCopy();
+    prefs.programming = mergeProgrammingPreferences(prefs.programming || {}, partial || {});
+    this.savePreferences(prefs);
+    return prefs.programming;
   }
 
   /** 读取快速聊天入口偏好。 */

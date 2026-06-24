@@ -34,6 +34,7 @@ import {
 } from "../../shared/workspace-ui-state.ts";
 import { normalizeSidebarUiPrefs } from "../../shared/sidebar-ui-state.ts";
 import { normalizeNotificationPreferences } from "../../shared/notification-preferences.ts";
+import { normalizeProgrammingPreferences } from "../../shared/programming-preferences.ts";
 import { normalizeQuickChatPreferences } from "../../shared/quick-chat-preferences.ts";
 import { normalizeBrowserPreferences } from "../../shared/browser-preferences.ts";
 import {
@@ -323,6 +324,31 @@ export function createPreferencesRoute(engine: any, options: Record<string, any>
       const patch = body.notifications && typeof body.notifications === "object" ? body.notifications : body;
       const notifications = engine.setNotificationPreferences(patch);
       return c.json({ ok: true, notifications });
+    } catch (err) {
+      return c.json({ error: err.message }, 400);
+    }
+  });
+
+  route.get("/preferences/programming", async (c) => {
+    try {
+      return c.json({ programming: engine.getProgrammingPreferences?.() || normalizeProgrammingPreferences({}) });
+    } catch (err) {
+      return c.json({ error: err.message }, 500);
+    }
+  });
+
+  route.put("/preferences/programming", async (c) => {
+    try {
+      const body = await safeJson(c);
+      if (!body || typeof body !== "object") {
+        return c.json({ error: "invalid JSON body" }, 400);
+      }
+      if (typeof engine.setProgrammingPreferences !== "function") {
+        return c.json({ error: "programming preferences unavailable" }, 500);
+      }
+      const patch = body.programming && typeof body.programming === "object" ? body.programming : body;
+      const programming = engine.setProgrammingPreferences(patch);
+      return c.json({ ok: true, programming });
     } catch (err) {
       return c.json({ error: err.message }, 400);
     }

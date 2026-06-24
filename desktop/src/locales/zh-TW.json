@@ -31,6 +31,7 @@
   "channel": {
     "tab": "頻道",
     "chatTab": "聊天",
+    "programmingTab": "程式設計",
     "moreTabs": "更多標籤",
     "empty": "還沒有頻道 ✿",
     "dmLabel": "私聊",
@@ -851,6 +852,7 @@
       "models": "模型",
       "memory": "記憶",
       "work": "工作台",
+      "programming": "程式設計",
       "skills": "技能",
       "mcp": "連接器",
       "bridge": "社群平台",
