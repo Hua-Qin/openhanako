@@ -1,0 +1,250 @@
+/* coding.module.css — 编程模式编辑器组件样式 */
+
+.tabBar {
+  display: flex;
+  align-items: stretch;
+  height: 36px;
+  min-height: 36px;
+  background: var(--coding-tabbar-bg, var(--surface-elev-1, #1e1e1e));
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.tabBar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px 0 12px;
+  min-width: 0;
+  max-width: 220px;
+  height: 100%;
+  border: none;
+  border-right: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
+  background: transparent;
+  color: var(--text-color-secondary, #aaa);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+  transition: background-color 0.12s ease;
+  flex-shrink: 0;
+}
+
+.tab:hover {
+  background: var(--hover-bg, rgba(255, 255, 255, 0.04));
+  color: var(--text-color, #ddd);
+}
+
+.tabActive {
+  background: var(--coding-tab-active-bg, var(--surface-bg, #ffffff));
+  color: var(--text-color, #222);
+}
+
+.tabActive::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--accent-color, #0066ff);
+}
+
+.tabDirtyDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-color, #0066ff);
+  flex-shrink: 0;
+}
+
+.tabName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tabClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.12s ease, background-color 0.12s ease;
+}
+
+.tabClose:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.editorWrap {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  background: var(--coding-editor-bg, var(--surface-bg, #ffffff));
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text-color-secondary, #888);
+  background: var(--coding-editor-bg, var(--surface-bg, #ffffff));
+  user-select: none;
+}
+
+.emptyIcon {
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-color, #444);
+}
+
+.emptyHint {
+  font-size: 12px;
+  color: var(--text-color-secondary, #888);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-color-secondary, #888);
+  font-size: 12px;
+}
+
+/* CodingPage 四栏布局 */
+.codingPage {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  background: var(--app-bg, transparent);
+}
+
+.codingEditorColumn {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  border-right: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+}
+
+.codingFileTree {
+  width: var(--coding-filetree-width, 220px);
+  min-width: 160px;
+  max-width: 360px;
+  flex-shrink: 0;
+  background: var(--coding-filetree-bg, var(--surface-elev-1, #fafafa));
+  border-right: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.codingFileTreeHeader {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-color-secondary, #888);
+  flex-shrink: 0;
+}
+
+.codingFileTreeBody {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.codingEditorMain {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.codingChatColumn {
+  width: var(--coding-chat-width, 380px);
+  min-width: 280px;
+  max-width: 520px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--chat-bg, var(--surface-bg, #fff));
+}
+
+.codingChatHeader {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-color-secondary, #666);
+  flex-shrink: 0;
+}
+
+.codingChatBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 响应式：在窄屏下折叠中间栏与文件树 */
+@media (max-width: 1400px) {
+  .codingFileTree {
+    width: 180px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .codingChatColumn {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .codingFileTree {
+    display: none;
+  }
+}
