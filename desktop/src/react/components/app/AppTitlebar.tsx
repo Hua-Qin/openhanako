@@ -76,6 +76,7 @@ export function AppTitlebar({
           </button>
         )}
       </div>
+      {/* ── 聊天/编程 模式切换按钮组 ── */}
       <div className="tb-mode-switch">
         <button
           className={`tb-mode-btn${currentTab === 'chat' ? ' active' : ''}`}

@@ -172,8 +172,8 @@
     "modeCode": "编程"
   },
   "code": {
-    "noFileOpen": "还没有打开文件",
-    "openFileHint": "从右侧工作台双击文件来开始编辑"
+    "noFileOpen": "暂无打开的文件",
+    "openFileHint": "从右侧工作台双击文件以打开编辑"
   },
   "session": {
     "untitled": "新对话",

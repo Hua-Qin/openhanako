@@ -143,7 +143,7 @@ export function AppPages() {
         <BridgePanel />
       </MainContent>
 
-      {currentTab !== 'code' && <PreviewPanel />}
+      {currentTab === 'chat' && <PreviewPanel />}
       <WorkspaceCompanionRail />
     </>
   );

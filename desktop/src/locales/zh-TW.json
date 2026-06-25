@@ -166,8 +166,8 @@
     "modeCode": "編程"
   },
   "code": {
-    "noFileOpen": "還沒有開啟檔案",
-    "openFileHint": "從右側工作台雙擊檔案來開始編輯"
+    "noFileOpen": "暫無開啟的檔案",
+    "openFileHint": "從右側工作台雙擊檔案以開啟編輯"
   },
   "session": {
     "untitled": "新對話",

@@ -4,6 +4,9 @@
  * 三栏布局的中间区域：上方编辑器 + 下方 AI 对话。
  * 编辑器复用 PreviewEditor + preview store 数据。
  * 从右侧工作台双击文件 → openPreview 机制 → 编辑器加载。
+ *
+ * 左侧会话列表（ChatSidebar）和右侧工作台（WorkspaceCompanionRail）
+ * 在编程模式下依然保留，与编辑器形成完整三栏布局。
  */
 
 import { useCallback } from 'react';
@@ -19,7 +22,7 @@ import type { PreviewItem } from '../../types';
 
 declare function t(key: string, vars?: Record<string, string | number>): string;
 
-/** 判断 previewItem 是否可编辑 */
+/** 判断 previewItem 是否可编辑（markdown/code/csv + 有 filePath） */
 function isEditable(item: PreviewItem | null): boolean {
   if (!item) return false;
   if (item.status === 'missing') return false;
@@ -83,6 +86,13 @@ function EditorArea() {
   );
 }
 
+/**
+ * CodePage — 编程模式中间区域
+ *
+ * 布局：
+ * - 上方（flex:1）：编辑器区域（标签页 + PreviewEditor）
+ * - 下方（固定高度）：AI 对话区域（ChatArea + InputArea）
+ */
 export function CodePage() {
   const currentSessionPath = useStore(s => s.currentSessionPath);
 

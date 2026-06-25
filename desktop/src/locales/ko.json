@@ -166,8 +166,8 @@
     "modeCode": "코드"
   },
   "code": {
-    "noFileOpen": "열린 파일이 없습니다",
-    "openFileHint": "오른쪽 워크스페이스에서 파일을 더블클릭하여 편집을 시작하세요"
+    "noFileOpen": "열린 파일 없음",
+    "openFileHint": "오른쪽 워크스페이스에서 파일을 더블클릭하여 여세요"
   },
   "session": {
     "untitled": "새 대화",

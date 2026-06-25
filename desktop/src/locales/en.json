@@ -173,7 +173,7 @@
   },
   "code": {
     "noFileOpen": "No file open",
-    "openFileHint": "Double-click a file from the workspace to start editing"
+    "openFileHint": "Double-click a file from the right workspace to open it"
   },
   "session": {
     "untitled": "New Chat",

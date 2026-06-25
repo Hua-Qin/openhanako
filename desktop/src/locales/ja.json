@@ -166,8 +166,8 @@
     "modeCode": "コード"
   },
   "code": {
-    "noFileOpen": "ファイルが開かれていません",
-    "openFileHint": "右側のワークスペースからファイルをダブルクリックして編集を開始"
+    "noFileOpen": "開いているファイルはありません",
+    "openFileHint": "右側のワークスペースでファイルをダブルクリックして開く"
   },
   "session": {
     "untitled": "新しいチャット",
