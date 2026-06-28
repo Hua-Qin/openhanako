@@ -439,7 +439,9 @@
       "expand": "파일 트리 펼치기"
     },
     "chat": {
-      "title": "AI 어시스턴트"
+      "title": "AI 어시스턴트",
+      "expand": "AI 어시스턴트 펼치기",
+      "collapse": "AI 어시스턴트 접기"
     }
   },
   "cron": {

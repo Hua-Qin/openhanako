@@ -439,7 +439,9 @@
       "expand": "ファイルツリーを展開"
     },
     "chat": {
-      "title": "AI アシスタント"
+      "title": "AI アシスタント",
+      "expand": "AI アシスタントを展開",
+      "collapse": "AI アシスタントを折りたたむ"
     }
   },
   "cron": {

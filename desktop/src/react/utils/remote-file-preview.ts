@@ -12,7 +12,7 @@ import { useStore } from '../stores';
 import { resolveServerConnection } from '../services/server-connection';
 import { resolveFileRefUrl } from '../services/resource-url';
 import { BINARY_PREVIEW_TYPES, PREVIEWABLE_EXTS, openFilePreview } from './file-preview';
-import { extOfName, inferKindByExt, isMediaKind } from './file-kind';
+import { extOfName, inferKindByExt, isMarkdownFileName, isMediaKind } from './file-kind';
 import { openMediaViewerForRef } from './open-media-viewer';
 import { showError } from './ui-helpers';
 import { isWebRuntime } from './platform-runtime';
@@ -396,6 +396,21 @@ export async function openFileRefPreview(file: FileRef, context: FileRefPreviewC
       sessionPath: context.sessionPath,
     });
     return;
+  }
+
+  // 编程模式：用 Monaco 编辑器打开文件（而非 Markdown 预览）
+  // 右栏选中的本地文件可直接打开；远端 session 文件走 workbench API 读取
+  const currentTab = useStore.getState().currentTab;
+  if (currentTab === 'coding' && !isMediaKind(file.kind) && !isMarkdownFileName(file.name)) {
+    // 编程模式下，本地路径直接用 Monaco 打开
+    if (file.path) {
+      const subdir = ''; // session 注册文件无独立子目录
+      const id = await useStore.getState().openFile?.(file.path, file.name, subdir);
+      if (id) {
+        useStore.getState().setActiveTab?.(id);
+        return;
+      }
+    }
   }
 
   if (!isWebRuntime() && file.path) {

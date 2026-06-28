@@ -214,12 +214,66 @@
   display: flex;
   align-items: center;
   height: 36px;
-  padding: 0 12px;
+  padding: 0 8px 0 12px;
   border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
   font-size: 12px;
   font-weight: 600;
   color: var(--text-color-secondary, #666);
   flex-shrink: 0;
+  gap: 4px;
+}
+
+.codingChatHeaderTitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codingChatCollapseBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-color-secondary, #666);
+  cursor: pointer;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: background-color 0.12s ease;
+}
+
+.codingChatCollapseBtn:hover {
+  background: var(--hover-bg, rgba(0, 0, 0, 0.05));
+  color: var(--text-color, #333);
+}
+
+.expandChatButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: center;
+  margin: 0 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  background: var(--surface-bg, #fff);
+  color: var(--text-color-secondary, #666);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transition: background-color 0.12s ease;
+  flex-shrink: 0;
+}
+
+.expandChatButton:hover {
+  background: var(--hover-bg, rgba(0, 0, 0, 0.04));
+  color: var(--text-color, #333);
 }
 
 .codingChatBody {

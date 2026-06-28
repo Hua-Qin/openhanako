@@ -541,7 +541,9 @@
       "expand": "展开文件树"
     },
     "chat": {
-      "title": "AI 助手"
+      "title": "AI 助手",
+      "expand": "展开 AI 助手",
+      "collapse": "收起 AI 助手"
     }
   },
   "cron": {

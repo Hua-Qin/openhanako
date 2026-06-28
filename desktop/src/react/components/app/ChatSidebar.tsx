@@ -132,7 +132,8 @@ export function ChatSidebar({
   return (
     <aside className={`sidebar${open ? '' : ' collapsed'}`} id="sidebar">
       <div className="sidebar-inner">
-        <div className={`sidebar-chat-content${currentTab === 'chat' ? '' : ' hidden'}`}>
+        {/* 频道列表只在 channels tab 显示；chat 与 coding 都显示对话/活动/工作区等内容 */}
+        <div className={`sidebar-chat-content${currentTab === 'channels' ? ' hidden' : ''}`}>
           <ChatSidebarContent {...contentProps} />
         </div>
 

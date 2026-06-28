@@ -475,7 +475,9 @@
       "expand": "Expand file tree"
     },
     "chat": {
-      "title": "AI Assistant"
+      "title": "AI Assistant",
+      "expand": "Expand AI assistant",
+      "collapse": "Collapse AI assistant"
     }
   },
   "cron": {

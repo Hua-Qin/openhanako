@@ -5,7 +5,7 @@
  * 本组件只渲染中间区域：第二栏（编辑器）+ 第三栏（AI 聊天）。
  */
 
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useStore } from '../../stores';
 import { CodingFileTree } from '../coding/CodingFileTree';
 import { EditorTabBar } from '../coding/EditorTabBar';
@@ -22,19 +22,28 @@ const tr = (key: string, vars?: Record<string, string | number>): string => {
 export function CodingPage() {
   const codingFileTreeOpen = useStore(s => s.codingFileTreeOpen);
   const setCodingFileTreeOpen = useStore(s => s.setCodingFileTreeOpen);
+  const codingChatOpen = useStore(s => s.codingChatOpen);
+  const setCodingChatOpen = useStore(s => s.setCodingChatOpen);
   const currentSessionPath = useStore(s => s.currentSessionPath);
 
   // 编程模式自动展开右侧工作区栏
   useEffect(() => {
     const s = useStore.getState();
     if (!s.jianOpen) {
-      // 保留用户偏好：若用户曾主动关闭，则不强制打开
       const savedRight = localStorage.getItem('hana-jian');
       if (savedRight !== 'closed') {
         useStore.setState({ jianOpen: true, jianAutoCollapsed: false });
       }
     }
+    // 编程模式默认展开 AI 助手栏
+    if (s.codingChatOpen === undefined) {
+      useStore.setState({ codingChatOpen: true });
+    }
   }, []);
+
+  const toggleChatColumn = useCallback(() => {
+    setCodingChatOpen(!codingChatOpen);
+  }, [codingChatOpen, setCodingChatOpen]);
 
   return (
     <div className={styles.codingPage} data-coding-page="">
@@ -85,23 +94,52 @@ export function CodingPage() {
         </div>
       </div>
 
+      {/* 展开 AI 助手栏的按钮（仅在收起时显示） */}
+      {!codingChatOpen && (
+        <button
+          type="button"
+          className={styles.expandChatButton}
+          onClick={toggleChatColumn}
+          title={tr('coding.chat.expand')}
+          aria-label={tr('coding.chat.expand')}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span>{tr('coding.chat.title')}</span>
+        </button>
+      )}
+
       {/* 第三栏：AI 聊天区 */}
-      <div className={styles.codingChatColumn}>
-        <div className={styles.codingChatHeader}>
-          {tr('coding.chat.title')}
+      {codingChatOpen && (
+        <div className={styles.codingChatColumn}>
+          <div className={styles.codingChatHeader}>
+            <span className={styles.codingChatHeaderTitle}>{tr('coding.chat.title')}</span>
+            <button
+              type="button"
+              className={styles.codingChatCollapseBtn}
+              onClick={toggleChatColumn}
+              title={tr('coding.chat.collapse')}
+              aria-label={tr('coding.chat.collapse')}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+          <div className={styles.codingChatBody}>
+            <RegionalErrorBoundary region="coding-chat" resetKeys={[currentSessionPath]}>
+              <ChatArea />
+            </RegionalErrorBoundary>
+            <RegionalErrorBoundary
+              region="coding-input"
+              resetKeys={[currentSessionPath]}
+            >
+              <InputArea key={currentSessionPath || '__new'} surface="desktop" />
+            </RegionalErrorBoundary>
+          </div>
         </div>
-        <div className={styles.codingChatBody}>
-          <RegionalErrorBoundary region="coding-chat" resetKeys={[currentSessionPath]}>
-            <ChatArea />
-          </RegionalErrorBoundary>
-          <RegionalErrorBoundary
-            region="coding-input"
-            resetKeys={[currentSessionPath]}
-          >
-            <InputArea key={currentSessionPath || '__new'} surface="desktop" />
-          </RegionalErrorBoundary>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -333,6 +333,10 @@ export function createEditorSlice(set: (partial: Partial<EditorSlice> | ((s: Edi
       set(() => ({ codingFileTreeOpen: open }));
     },
 
+    setCodingChatOpen(open) {
+      set(() => ({ codingChatOpen: open }));
+    },
+
     closeAllSaved() {
       set((s) => {
         const remaining = s.openTabs.filter(t => t.dirty);
