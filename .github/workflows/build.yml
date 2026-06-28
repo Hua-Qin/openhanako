@@ -13,17 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
-            target: dmg
-            arch: arm64
-          - os: macos-latest
-            target: dmg
-            arch: x64
           - os: windows-latest
             target: nsis
-            arch: x64
-          - os: ubuntu-latest
-            target: AppImage
             arch: x64
 
     runs-on: ${{ matrix.os }}
@@ -38,7 +29,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       # Windows: 下载 PortableGit（含 bash + coreutils），解压后裁剪，打包进安装包
       - name: Download & prune PortableGit
@@ -204,128 +195,3 @@ jobs:
             dist/*.deb
             dist/latest*.yml
           if-no-files-found: error
-
-  release:
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24.15.0"
-
-      # 所有 Release 默认 pre-release，手动在 GitHub 上将稳定版本标记为 latest
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      # build job 改为 --publish never 后，draft release 不再由 electron-builder 自动创建，
-      # 由 release job 显式创建，并通过 --generate-notes 从上一个 tag 的 commit 自动生成 changelog。
-      - name: Create draft release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if gh release view "${{ github.ref_name }}" >/dev/null 2>&1; then
-            echo "Release ${{ github.ref_name }} already exists, skipping create"
-          else
-            gh release create "${{ github.ref_name }}" \
-              --draft \
-              --prerelease \
-              --title "${{ github.ref_name }}" \
-              --generate-notes
-          fi
-
-      # 合并双架构的 latest-mac.yml（本地生成，不上传；上传由下一步统一处理）
-      - name: Generate merged latest-mac.yml
-        run: |
-          node scripts/merge-latest-mac-yml.cjs artifacts latest-mac.yml
-
-      # 单点上传所有 release assets（dmg/zip/exe/AppImage/deb/yml），blockmap 不上传
-      - name: Upload release assets
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -e
-
-          echo "=== Uploading installers ==="
-          find artifacts \( -name '*.dmg' -o -name '*.zip' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) -print0 |
-            while IFS= read -r -d '' f; do
-              echo "  $f"
-              gh release upload "${{ github.ref_name }}" "$f" --clobber
-            done
-
-          echo "=== Uploading latest.yml (Windows) ==="
-          WIN_YML=$(find artifacts -name 'latest.yml' | head -1)
-          if [ -n "$WIN_YML" ]; then
-            echo "  $WIN_YML"
-            gh release upload "${{ github.ref_name }}" "$WIN_YML" --clobber
-          else
-            echo "::warning::latest.yml not found (Windows build may have failed)"
-          fi
-
-          echo "=== Uploading latest-mac.yml (merged) ==="
-          gh release upload "${{ github.ref_name }}" latest-mac.yml --clobber
-
-          echo "=== Uploading latest-linux.yml ==="
-          LINUX_YML=$(find artifacts -name 'latest-linux.yml' | head -1)
-          if [ -n "$LINUX_YML" ]; then
-            echo "  $LINUX_YML"
-            gh release upload "${{ github.ref_name }}" "$LINUX_YML" --clobber
-          else
-            echo "::warning::latest-linux.yml not found (Linux build may have failed)"
-          fi
-
-      # 硬约束：release 必须包含所有必需产物，缺一个 CI 就 fail，draft 状态留给人手动检查。
-      # 防止以后再有 shell 写漏 / electron-builder 配置改坏 / 单架构构建挂掉 造成的 yml 缺失。
-      - name: Verify release assets
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -e
-          ASSETS=$(gh release view "${{ github.ref_name }}" --json assets --jq '.assets[].name')
-          echo "=== Release assets ==="
-          echo "$ASSETS"
-          echo ""
-
-          MISSING=()
-          echo "$ASSETS" | grep -qx 'latest-mac.yml' || MISSING+=("latest-mac.yml")
-          echo "$ASSETS" | grep -qx 'latest.yml' || MISSING+=("latest.yml")
-          echo "$ASSETS" | grep -qx 'latest-linux.yml' || MISSING+=("latest-linux.yml")
-          echo "$ASSETS" | grep -qE '^HanaAgent-.*-macOS-arm64\.dmg$' || MISSING+=("macOS-arm64.dmg")
-          echo "$ASSETS" | grep -qE '^HanaAgent-.*-macOS-arm64\.zip$' || MISSING+=("macOS-arm64.zip")
-          echo "$ASSETS" | grep -qE '^HanaAgent-.*-macOS-x64\.dmg$' || MISSING+=("macOS-x64.dmg")
-          echo "$ASSETS" | grep -qE '^HanaAgent-.*-macOS-x64\.zip$' || MISSING+=("macOS-x64.zip")
-          echo "$ASSETS" | grep -qE '^HanaAgent-.*-Windows-x64\.exe$' || MISSING+=("Windows-x64.exe")
-          echo "$ASSETS" | grep -qE '^HanaAgent-.*-Linux-(x64|x86_64)\.AppImage$' || MISSING+=("Linux AppImage")
-          echo "$ASSETS" | grep -qE '^HanaAgent-.*-Linux-(x64|amd64)\.deb$' || MISSING+=("Linux deb")
-
-          # 清洁性检查：不应该有 blockmap 漏进来
-          if echo "$ASSETS" | grep -qE '\.blockmap$'; then
-            echo "::warning::blockmap files leaked into release (should be excluded by design):"
-            echo "$ASSETS" | grep -E '\.blockmap$'
-          fi
-
-          if [ ${#MISSING[@]} -gt 0 ]; then
-            echo ""
-            echo "::error::Missing required assets: ${MISSING[*]}"
-            echo "Release will remain as draft for manual inspection."
-            exit 1
-          fi
-          echo ""
-          echo "✓ All required assets present"
-
-      - name: Publish release (un-draft, pre-release)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release edit "${{ github.ref_name }}" --prerelease --draft=false
